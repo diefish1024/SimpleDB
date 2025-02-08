@@ -2,21 +2,23 @@
 #include "Statement.hpp"
 #include <iostream>
 
+VirtualMachine::VirtualMachine() : table() {}
+
 void VirtualMachine::run(const Statement& statement) {
     switch (statement.type) {
         case StatementType::INSERT:
-            executeInsert();
+            executeInsert(statement);
             break;
         case StatementType::SELECT:
-            executeSelect();
+            executeSelect(statement);
             break;
     }
 }
 
-void VirtualMachine::executeInsert() {
-    std::cout << "This is where we would do an insert." << std::endl;
+void VirtualMachine::executeInsert(const Statement& statement) {
+    table.insertRow(statement.row_to_insert);
 }
 
-void VirtualMachine::executeSelect() {
-    std::cout << "This is where we would do a select." << std::endl;
+void VirtualMachine::executeSelect(const Statement& statement) {
+    table.selectAll();
 }

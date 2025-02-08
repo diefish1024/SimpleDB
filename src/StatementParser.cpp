@@ -12,6 +12,16 @@ PrepareResult prepareStatement(const std::string& input, Statement& statement) {
 
     if (token == "insert") {
         statement.type = StatementType::INSERT;
+        int id;
+        std::string username;
+        std::string email;
+        if (!(iss >> id >> username >> email)) {
+            return PrepareResult::PREPARE_SYNTAX_ERROR;
+        }
+        if (id < 0) {
+            return PrepareResult::PREPARE_NEGATIVE_ID;
+        }
+        statement.row_to_insert = {id, username, email};
         return PrepareResult::PREPARE_SUCCESS;
     } else if (token == "select") {
         statement.type = StatementType::SELECT;
