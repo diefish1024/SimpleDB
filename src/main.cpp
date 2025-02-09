@@ -5,6 +5,7 @@
 #include "MetaCommand.hpp"
 #include <iostream>
 #include <string>
+#include <sstream>
 
 void printPrompt() {
     std::cout << "db > ";
@@ -12,7 +13,7 @@ void printPrompt() {
 
 int main() {
     InputBuffer input_buffer;
-    VirtualMachine vm;
+    VirtualMachine vm(new Table());
     while (true) {
         printPrompt();
         input_buffer.readInput();
@@ -21,18 +22,47 @@ int main() {
 
         if (!input.empty() && input[0] == '.') {
             auto metaResult = doMetaCommand(input);
-            if (metaResult == MetaCommandResult::META_COMMAND_UNRECOGNIZED) {
-                continue;
+            switch (metaResult) {
+                case MetaCommandResult::META_COMMAND_SUCCESS:
+                    continue;
+                case MetaCommandResult::META_COMMAND_UNRECOGNIZED:
+                    std::cerr << "Unrecognized command: " << input << std::endl;
+                    continue;
             }
         }
         else {
             Statement statement;
             auto prepResult = prepareStatement(input, statement);
-            if (prepResult != PrepareResult::PREPARE_SUCCESS) {
-                std::cerr << "Error: Failed to prepare statement." << std::endl;
-                continue;
+            switch (prepResult) {
+                case PrepareResult::PREPARE_SUCCESS:
+                    break;
+                case PrepareResult::PREPARE_SYNTAX_ERROR:
+                    std::cerr << "Syntax error. Could not parse statement." << std::endl;
+                    continue;
+                case PrepareResult::PREPARE_NEGATIVE_ID:
+                    std::cerr << "ID must be positive." << std::endl;
+                    continue;
+                case PrepareResult::REPARE_STRING_TOO_LONG:
+                    std::cerr << "String is too long." << std::endl;
+                    continue;
+                case PrepareResult::PREPARE_UNRECOGNIZED: {
+                    std::istringstream iss(input);
+                    std::string token;
+                    iss >> token;
+                    std::cerr << "Unrecognized keyword at start of " << token << std::endl;
+                    continue;
+                }
             }
-            vm.run(statement);
+
+            auto executeResult = vm.run(statement);
+            switch (executeResult) {
+                case ExcuteResult::EXECUTE_SUCCESS:
+                    std::cout << "Executed." << std::endl;
+                    break;
+                case ExcuteResult::EXECUTE_TABLE_FULL:
+                    std::cerr << "Error: Table is full." << std::endl;
+                    break;
+            }
         }
     }
     return 0;

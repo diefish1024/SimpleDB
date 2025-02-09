@@ -15,7 +15,7 @@ public:
 
 private:
     std::vector<Row> rows;
-    static const uint32_t MAX_ROWS = 1000;
+    static const uint32_t MAX_ROWS = 10000;
 };
 
 #endif // TABLE_HPP

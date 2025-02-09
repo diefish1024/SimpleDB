@@ -4,18 +4,24 @@
 #include "Statement.hpp"
 #include "Table.hpp"
 
+enum class ExcuteResult {
+    EXECUTE_SUCCESS,
+    EXECUTE_TABLE_FULL,
+    EXECUTE_UNKNOWN
+};
+
 class VirtualMachine {
 public:
-    VirtualMachine();
+    VirtualMachine(Table* table) : table(table) {};
     VirtualMachine(const VirtualMachine&) = delete;
     ~VirtualMachine() = default;
 
-    void run(const Statement& statement);
+    ExcuteResult run(const Statement& statement);
 private:
-    void executeInsert(const Statement& statement);
-    void executeSelect(const Statement& statement);
+    ExcuteResult executeInsert(const Statement& statement);
+    ExcuteResult executeSelect(const Statement& statement);
     
-    Table table;
+    Table* table;
 };
 
 #endif // VIRTUALMACHINE_HPP
