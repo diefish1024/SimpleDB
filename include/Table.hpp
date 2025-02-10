@@ -4,18 +4,23 @@
 #include <vector>
 #include <cstdint>
 #include "Row.hpp"
+#include "Pager.hpp"
+
+const uint32_t MAX_ROWS = 10000;
 
 class Table {
 public:
-    Table();
+    explicit Table(const std::string& filename, Pager* pager);
     ~Table();
 
     bool insertRow(const Row& row);
     void selectAll() const;
 
+    void flush(); // Ensure all changes are written to disk
+
 private:
-    std::vector<Row> rows;
-    static const uint32_t MAX_ROWS = 10000;
+    Pager* pager;
+    uint32_t num_rows;
 };
 
 #endif // TABLE_HPP

@@ -2,7 +2,7 @@
 #define VIRTUALMACHINE_HPP
 
 #include "Statement.hpp"
-#include "Table.hpp"
+#include "DB.hpp"
 
 enum class ExcuteResult {
     EXECUTE_SUCCESS,
@@ -12,7 +12,7 @@ enum class ExcuteResult {
 
 class VirtualMachine {
 public:
-    VirtualMachine(Table* table) : table(table) {};
+    VirtualMachine(DB* db);
     VirtualMachine(const VirtualMachine&) = delete;
     ~VirtualMachine() = default;
 
@@ -21,7 +21,7 @@ private:
     ExcuteResult executeInsert(const Statement& statement);
     ExcuteResult executeSelect(const Statement& statement);
     
-    Table* table;
+    DB* db;
 };
 
 #endif // VIRTUALMACHINE_HPP

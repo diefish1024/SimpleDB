@@ -2,7 +2,9 @@
 
 A C++ Version of the SimpleDB project from the [sqlite tutorial](https://cstack.github.io/db_tutorial/).
 
-Current progress: [part 4](https://cstack.github.io/db_tutorial/part_4.html)
+Current progress: [part 5](https://cstack.github.io/db_tutorial/part_5.html)
+
+(still some bugs to be fixed)
 
 #### Project Structure
 
@@ -11,16 +13,20 @@ Current progress: [part 4](https://cstack.github.io/db_tutorial/part_4.html)
 ├── CMakelists.txt
 ├── README.md
 ├── include
+│   ├── DB.hpp
 │   ├── InputBuffer.hpp
 │   ├── MetaCommand.hpp
+│   ├── Pager.hpp
 │   ├── Row.hpp
 │   ├── Statement.hpp
 │   ├── StatementParser.hpp
 │   ├── Table.hpp
 │   └── VirtualMachine.hpp
 ├── src
+│   ├── DB.cpp
 │   ├── InputBuffer.cpp
 │   ├── MetaCommand.cpp
+│   ├── Pager.cpp
 │   ├── StatementParser.cpp
 │   ├── Table.cpp
 │   ├── VirtualMachine.cpp

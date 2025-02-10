@@ -2,6 +2,8 @@
 #include "Statement.hpp"
 #include <iostream>
 
+VirtualMachine::VirtualMachine(DB* db) : db(db) {}
+
 ExcuteResult VirtualMachine::run(const Statement& statement) {
     switch (statement.type) {
         case StatementType::INSERT:
@@ -13,11 +15,11 @@ ExcuteResult VirtualMachine::run(const Statement& statement) {
 }
 
 ExcuteResult VirtualMachine::executeInsert(const Statement& statement) {
-    return table->insertRow(statement.row_to_insert) ? 
+    return db->getTable()->insertRow(statement.row_to_insert) ? 
         ExcuteResult::EXECUTE_SUCCESS : ExcuteResult::EXECUTE_TABLE_FULL;
 }
 
 ExcuteResult VirtualMachine::executeSelect(const Statement& statement) {
-    table->selectAll();
+    db->getTable()->selectAll();
     return ExcuteResult::EXECUTE_SUCCESS;
 }

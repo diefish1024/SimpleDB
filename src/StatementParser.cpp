@@ -4,6 +4,7 @@
 #include <string>
 #include <sstream>
 #include <cstdlib>
+#include <cstring>
 
 PrepareResult prepareStatement(const std::string& input, Statement& statement) {
     std::istringstream iss(input);
@@ -30,7 +31,9 @@ PrepareResult prepareStatement(const std::string& input, Statement& statement) {
         if (email.size() > COLUMN_EMAIL_MAX_LENGTH) {
             return PrepareResult::REPARE_STRING_TOO_LONG;
         }
-        statement.row_to_insert = {id, username, email};
+        std::strncpy(statement.row_to_insert.username, username.c_str(), COLUMN_USERNAME_MAX_LENGTH);
+        std::strncpy(statement.row_to_insert.email, email.c_str(), COLUMN_EMAIL_MAX_LENGTH);
+        statement.row_to_insert.id = id;
         return PrepareResult::PREPARE_SUCCESS;
     } else if (token == "select") {
         if (iss >> token) { // exam if there are more tokens

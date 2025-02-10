@@ -3,6 +3,7 @@
 #include "StatementParser.hpp"
 #include "VirtualMachine.hpp"
 #include "MetaCommand.hpp"
+#include "DB.hpp"
 #include <iostream>
 #include <string>
 #include <sstream>
@@ -11,9 +12,19 @@ void printPrompt() {
     std::cout << "db > ";
 }
 
-int main() {
+int main(int argc, char* argv[]) {
+
+    if (argc < 2) {
+        std::cerr << "Must supply a database filename." << std::endl;
+        return 1;
+    }
+
     InputBuffer input_buffer;
-    VirtualMachine vm(new Table());
+
+    std::string filename(argv[1]);
+    DB db(filename);
+    VirtualMachine vm(&db);
+
     while (true) {
         printPrompt();
         input_buffer.readInput();
@@ -23,8 +34,9 @@ int main() {
         if (!input.empty() && input[0] == '.') {
             auto metaResult = doMetaCommand(input);
             switch (metaResult) {
-                case MetaCommandResult::META_COMMAND_SUCCESS:
-                    continue;
+                case MetaCommandResult::META_COMMAND_EXIT:
+                    db.close();
+                    return 0;
                 case MetaCommandResult::META_COMMAND_UNRECOGNIZED:
                     std::cerr << "Unrecognized command: " << input << std::endl;
                     continue;
@@ -65,5 +77,4 @@ int main() {
             }
         }
     }
-    return 0;
 }

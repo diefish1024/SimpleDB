@@ -1,0 +1,29 @@
+#ifndef PAGER_HPP
+#define PAGER_HPP
+
+#include "Row.hpp"
+#include <cstdint>
+#include <fstream>
+
+const uint32_t PAGE_SIZE = 4096;
+const uint32_t TABLE_MAX_PAGES = 100;
+const uint32_t ROWS_PER_PAGE = PAGE_SIZE / ROW_SIZE;
+
+class Pager {
+public:
+    std::fstream file;
+    uint32_t file_length;
+    void* pages[TABLE_MAX_PAGES];
+
+    explicit Pager(const std::string& filename);
+    ~Pager();
+
+    void* getPage(uint32_t page_num); // Read a page from disk
+    void flush(uint32_t page_num); // Write a page to disk
+    void markDirty(uint32_t page_num); // Mark a page as dirty
+    
+private:
+    bool dirty_pages[TABLE_MAX_PAGES];
+};
+
+#endif // PAGER_HPP
