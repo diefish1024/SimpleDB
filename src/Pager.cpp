@@ -7,9 +7,10 @@
 Pager::Pager(const std::string& filename) {
     file.open(filename, std::ios::in | std::ios::out | std::ios::binary);
     if (!file) {
-        throw std::runtime_error("Unable to open file");
+        file.open(filename, std::ios::out | std::ios::binary);
+        file.close();
+        file.open(filename, std::ios::in | std::ios::out | std::ios::binary);
     }
-
     file.seekg(0, std::ios::end);
     file_length = file.tellg();
     file.clear();
@@ -51,6 +52,7 @@ void* Pager::getPage(uint32_t page_num) {
             }
         } else {
             memset(pages[page_num], 0, PAGE_SIZE);
+            file_length = PAGE_SIZE * (page_num + 1);
         }
     }
     return pages[page_num];
