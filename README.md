@@ -4,8 +4,6 @@ A C++ Version of the SimpleDB project from the [sqlite tutorial](https://cstack.
 
 Current progress: [part 5](https://cstack.github.io/db_tutorial/part_5.html)
 
-(still some bugs to be fixed)
-
 #### Project Structure
 
 ```
@@ -27,6 +25,7 @@ Current progress: [part 5](https://cstack.github.io/db_tutorial/part_5.html)
 │   ├── InputBuffer.cpp
 │   ├── MetaCommand.cpp
 │   ├── Pager.cpp
+│   ├── Row.cpp
 │   ├── StatementParser.cpp
 │   ├── Table.cpp
 │   ├── VirtualMachine.cpp
@@ -38,7 +37,7 @@ Current progress: [part 5](https://cstack.github.io/db_tutorial/part_5.html)
 
 #### Test
 
-We assume that the program is stored in the `build` directory.
+We assume that the program is stored in the `build` directory, if not, please change the path in the `test.py` file.
 
 ```
 $ python tests/test.py

@@ -32,7 +32,7 @@ int main(int argc, char* argv[]) {
         const std::string& input = input_buffer.getBuffer();
 
         if (!input.empty() && input[0] == '.') {
-            auto metaResult = doMetaCommand(input);
+            auto metaResult = parseMetaCommand(input);
             switch (metaResult) {
                 case MetaCommandResult::META_COMMAND_EXIT:
                     db.close();
