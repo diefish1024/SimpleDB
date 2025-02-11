@@ -6,9 +6,9 @@ VirtualMachine::VirtualMachine(DB* db) : db(db) {}
 
 ExcuteResult VirtualMachine::run(const Statement& statement) {
     switch (statement.type) {
-        case StatementType::INSERT:
+        case StatementType::STATEMENT_INSERT:
             return executeInsert(statement);
-        case StatementType::SELECT:
+        case StatementType::STATEMENT_SELECT:
             return executeSelect(statement);
     }
     return ExcuteResult::EXECUTE_UNKNOWN;

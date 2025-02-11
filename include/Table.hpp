@@ -13,9 +13,8 @@ const uint32_t MAX_META_PAGES = 1;
 
 class Table {
 public:
-
-explicit Table(const std::string& filename, Pager* pager);
-~Table();
+    explicit Table(const std::string& filename, Pager* pager);
+    ~Table();
 
     bool insertRow(const Row& row);
     void selectAll() const;
@@ -23,7 +22,7 @@ explicit Table(const std::string& filename, Pager* pager);
     void flush(); // Ensure all changes are written to disk
     
 private:
-    struct MetaData { // Sotred at Page 0
+    struct MetaData {
         uint32_t NUM_ROWS;
     } meta;
     static const uint32_t METADATA_SIZE = sizeof(MetaData);

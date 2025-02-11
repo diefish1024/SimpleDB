@@ -5,8 +5,8 @@
 
 // SQL statement types
 enum class StatementType {
-    INSERT,
-    SELECT
+    STATEMENT_INSERT,
+    STATEMENT_SELECT
 };
 
 // SQL statement results
