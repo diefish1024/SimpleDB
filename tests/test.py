@@ -4,17 +4,25 @@ import subprocess
 import time
 import unittest
 
-
 class TestSimpleDBCLI(unittest.TestCase):
-    def run_commands(self, commands, timeout=10):
+    def setUp(self):
+        self.clean_up()
+
+    def clean_up(self):
+        if os.path.exists("test.db"):
+            os.remove("test.db")
+
+    def run_commands(self, commands, timeout=2, clean_up=True):
         """
         Launch SimpleDB.exe, send commands, terminate with .exit, and return the output.
         """
         exe_path = os.path.join("build", "SimpleDB.exe")
         all_input = "\n".join(commands + [".exit"]) + "\n"
+        if clean_up:
+            self.clean_up()
         try:
             proc = subprocess.Popen(
-                [exe_path],
+                [exe_path, "test.db"],
                 stdin=subprocess.PIPE,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.STDOUT,
@@ -110,6 +118,35 @@ class TestSimpleDBCLI(unittest.TestCase):
         self.assertEqual(result, expected_output)
         print("test_negative_id passed")
 
+    def test_disk_persistence(self):
+        """
+        Test that data persists after .exit and restarting the program.
+        """
+        # Insert a record and exit
+        commands_insert = [
+            "insert 1 user1 user1@example.com"
+        ]
+        result_insert, err = self.run_commands(commands_insert)
+        self.assertEqual(result_insert, [
+            "db > Executed.",
+            "db > "
+        ])
+        
+        # Re-run the program and select the data
+        commands_select = [
+            "select"
+        ]
+        result_select, err = self.run_commands(commands_select, clean_up=False)
+        expected_output = [
+            "db > 1 user1 user1@example.com",
+            "Executed.",
+            "db > "
+        ]
+        self.assertEqual(result_select, expected_output)
+        print("test_disk_persistence passed")
+
 
 if __name__ == "__main__":
     unittest.main()
+    if os.path.exists("test.db"):
+        os.remove("test.db")

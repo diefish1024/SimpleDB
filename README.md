@@ -41,14 +41,13 @@ We assume that the program is stored in the `build` directory, if not, please ch
 
 ```
 $ python tests/test.py
-test_insert_and_select passed
+test_disk_persistence passed
+.test_insert_and_select passed
 .test_max_length_strings passed
 .test_negative_id passed
 .test_table_full passed
 .test_too_long_strings passed
 .
 ----------------------------------------------------------------------
-Ran 5 tests in 0.155s
-
-OK
+Ran 6 tests in 0.328s
 ```
