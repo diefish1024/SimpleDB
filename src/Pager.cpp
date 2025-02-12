@@ -15,14 +15,14 @@ Pager::Pager(const std::string& filename) {
     file_length = file.tellg();
     file.clear();
 
-    for (uint32_t i = 0; i < TABLE_MAX_PAGES; i++) {
+    for (uint32_t i = 0; i < MAX_PAGES; i++) {
         pages[i] = nullptr;
         dirty_pages[i] = false;
     }
 }
 
 Pager::~Pager() {
-    for (uint32_t i = 0; i < TABLE_MAX_PAGES; i++) {
+    for (uint32_t i = 0; i < MAX_PAGES; i++) {
         if (pages[i] != nullptr) {
             flush(i);
             delete[] static_cast<char*>(pages[i]);
@@ -33,7 +33,7 @@ Pager::~Pager() {
 }
 
 void* Pager::getPage(uint32_t page_num) {
-    if (page_num >= TABLE_MAX_PAGES) {
+    if (page_num >= MAX_PAGES) {
         throw std::runtime_error("Page number out of bounds");
     }
 

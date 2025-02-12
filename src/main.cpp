@@ -13,15 +13,15 @@ void printPrompt() {
 }
 
 void printConfig() {
-    std::cout << "Row size = " << ROW_SIZE << " bytes" << std::endl;
-    std::cout << "Rows per page = " << ROWS_PER_PAGE << std::endl;
-    std::cout << "Page size = " << PAGE_SIZE << " bytes" << std::endl;
-    std::cout << "Max pages = " << MAX_PAGES << std::endl;
-    std::cout << "Max rows = " << MAX_ROWS << std::endl;
+    std::cout << "ROW_SIZE = " << ROW_SIZE << " bytes" << std::endl;
+    std::cout << "ROWS_PER_PAGE = " << ROWS_PER_PAGE << std::endl;
+    std::cout << "PAGE_SIZE = " << PAGE_SIZE << " bytes" << std::endl;
+    std::cout << "MAX_PAGES = " << MAX_PAGES << std::endl;
+    std::cout << "MAX_ROWS = " << MAX_ROWS << std::endl;
 }
 
 int main(int argc, char* argv[]) {
-    if (argc > 1 && std::string(argv[1]) == "--config") {
+    if (argc > 1 && std::string(argv[1]) == "--show-config") {
         printConfig();
         return 0;
     }

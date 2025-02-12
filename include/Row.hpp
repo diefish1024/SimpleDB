@@ -16,7 +16,7 @@ struct Row {
 
 const uint32_t ROW_SIZE = sizeof(Row);
 
-void Row_print(const Row& row);
+void printRow(const Row& row);
 
 
 #endif // ROW_HPP

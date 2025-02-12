@@ -18,8 +18,6 @@ class TestSimpleDBCLI(unittest.TestCase):
         """
         exe_path = os.path.join("build", "SimpleDB.exe")
         all_input = "\n".join(commands + [".exit"]) + "\n"
-        if clean_up:
-            self.clean_up()
         try:
             proc = subprocess.Popen(
                 [exe_path, "test.db"],
@@ -29,6 +27,8 @@ class TestSimpleDBCLI(unittest.TestCase):
                 universal_newlines=True
             )
             out, err = proc.communicate(input=all_input, timeout=timeout)
+            if clean_up:
+                self.clean_up()
             return out.split("\n"), err
         except subprocess.TimeoutExpired:
             proc.kill()
@@ -52,12 +52,29 @@ class TestSimpleDBCLI(unittest.TestCase):
         self.assertEqual(result, expected_output)
         print("test_insert_and_select passed")
 
+    def get_max_rows(self):
+        """
+        use --config to get the max rows
+        """
+        exe_path = os.path.join("build", "SimpleDB.exe")
+        result = subprocess.run(
+            [exe_path, "--show-config"],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True
+        )
+        for line in result.stdout.split("\n"):
+            if line.startswith("MAX_ROWS = "):
+                return int(line.split("=")[1].strip())
+        raise ValueError("MAX_ROWS not found in config")
+
     def test_table_full(self):
         """
         Test error message when table is full.
-        Assuming table size is limited to 10000 rows.
         """
-        script = [f"insert {i} user{i} user{i}@example.com" for i in range(1, 10000)]
+        max_rows = self.get_max_rows()
+        # print(f"MAX_ROWS = {max_rows}")
+        script = [f"insert {i} user{i} user{i}@example.com" for i in range(0, max_rows + 1)]
         result, err = self.run_commands(script)
         self.assertEqual(result[-2], "db > Error: Table is full.")
         print("test_table_full passed")
@@ -126,7 +143,7 @@ class TestSimpleDBCLI(unittest.TestCase):
         commands_insert = [
             "insert 1 user1 user1@example.com"
         ]
-        result_insert, err = self.run_commands(commands_insert)
+        result_insert, err = self.run_commands(commands_insert, clean_up=False)
         self.assertEqual(result_insert, [
             "db > Executed.",
             "db > "
@@ -136,7 +153,7 @@ class TestSimpleDBCLI(unittest.TestCase):
         commands_select = [
             "select"
         ]
-        result_select, err = self.run_commands(commands_select, clean_up=False)
+        result_select, err = self.run_commands(commands_select)
         expected_output = [
             "db > 1 user1 user1@example.com",
             "Executed.",
@@ -148,5 +165,3 @@ class TestSimpleDBCLI(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
-    if os.path.exists("test.db"):
-        os.remove("test.db")
