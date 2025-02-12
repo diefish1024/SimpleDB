@@ -1,4 +1,5 @@
 #include "Table.hpp"
+#include "Cursor.hpp"
 #include <iostream>
 #include <string>
 #include <fstream>
@@ -29,10 +30,7 @@ void Table::loadMetaData() {
 
     if (pager->file_length == (METADATA_PAGE_NUM + 1) * PAGE_SIZE) {
         meta.NUM_ROWS = 0;
-        num_rows = 0;
         storeMetaData();
-    } else {
-        num_rows = meta.NUM_ROWS;
     }
 }
 
@@ -40,42 +38,58 @@ void Table::storeMetaData() {
     /*
      * if there multiple metadata pages, we do as loadaMetaData does.
      */
-    meta.NUM_ROWS = num_rows;
     void* meta_page = pager->getPage(METADATA_PAGE_NUM);
     std::memcpy(static_cast<char*>(meta_page) + METADATA_OFFSET, &meta, METADATA_SIZE);
     pager->markDirty(METADATA_PAGE_NUM);
 }
 
-bool Table::insertRow(const Row& row) {
-    if (num_rows > MAX_ROWS) {
-        return false;
-    }
-
-    uint32_t page_num = num_rows / ROWS_PER_PAGE + MAX_META_PAGES;
-    void* page = pager->getPage(page_num);
-    uint32_t row_offset = (num_rows % ROWS_PER_PAGE) * ROW_SIZE;
-
-    std::memcpy(static_cast<char*>(page) + row_offset, &row, ROW_SIZE);
-    pager->markDirty(page_num);
-
-    ++num_rows;
-    return num_rows <= MAX_ROWS;
+Cursor* Table::start() {
+    Cursor* cursor = new Cursor(this);
+    cursor->page_num = MAX_META_PAGES;
+    cursor->cell_num = 0;
+    cursor->end_of_table = meta.NUM_ROWS == 0;
+    return cursor;
 }
 
-void Table::selectAll() const {
-    for (uint32_t i = 0; i < num_rows; ++i) {
-        uint32_t page_num = i / ROWS_PER_PAGE + MAX_META_PAGES;
-        void* page = pager->getPage(page_num);
-        uint32_t row_offset = i % ROWS_PER_PAGE * ROW_SIZE;
-        Row* row = reinterpret_cast<Row*>(static_cast<char*>(page) + row_offset);
-        Row_print(*row);
-    }
+Cursor* Table::end() {
+    Cursor* cursor = new Cursor(this);
+    cursor->page_num = meta.NUM_ROWS / ROWS_PER_PAGE + MAX_META_PAGES;
+    cursor->cell_num = meta.NUM_ROWS % ROWS_PER_PAGE;
+    cursor->row_num = meta.NUM_ROWS;
+    cursor->end_of_table = true;
+    return cursor;
 }
+
+// bool Table::insertRow(const Row& row) {
+//     if (meta.NUM_ROWS > MAX_ROWS) {
+//         return false;
+//     }
+
+//     uint32_t page_num = meta.NUM_ROWS / ROWS_PER_PAGE + MAX_META_PAGES;
+//     void* page = pager->getPage(page_num);
+//     uint32_t row_offset = (meta.NUM_ROWS % ROWS_PER_PAGE) * ROW_SIZE;
+
+//     std::memcpy(static_cast<char*>(page) + row_offset, &row, ROW_SIZE);
+//     pager->markDirty(page_num);
+
+//     ++meta.NUM_ROWS;
+//     return meta.NUM_ROWS <= MAX_ROWS;
+// }
+
+// void Table::selectAll() const {
+//     for (uint32_t i = 0; i < meta.NUM_ROWS; ++i) {
+//         uint32_t page_num = i / ROWS_PER_PAGE + MAX_META_PAGES;
+//         void* page = pager->getPage(page_num);
+//         uint32_t row_offset = i % ROWS_PER_PAGE * ROW_SIZE;
+//         Row* row = reinterpret_cast<Row*>(static_cast<char*>(page) + row_offset);
+//         printRow(*row);
+//     }
+// }
 
 void Table::flush() {
     storeMetaData();
 
-    for (uint32_t i = 0; i < TABLE_MAX_PAGES; ++i) {
+    for (uint32_t i = 0; i < MAX_PAGES; ++i) {
         pager->flush(i);
     }
 }

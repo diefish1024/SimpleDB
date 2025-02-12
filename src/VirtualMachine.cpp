@@ -1,5 +1,7 @@
 #include "VirtualMachine.hpp"
 #include "Statement.hpp"
+#include "Table.hpp"
+#include "Cursor.hpp"
 #include <iostream>
 
 VirtualMachine::VirtualMachine(DB* db) : db(db) {}
@@ -15,11 +17,25 @@ ExcuteResult VirtualMachine::run(const Statement& statement) {
 }
 
 ExcuteResult VirtualMachine::executeInsert(const Statement& statement) {
-    return db->getTable()->insertRow(statement.row_to_insert) ? 
-        ExcuteResult::EXECUTE_SUCCESS : ExcuteResult::EXECUTE_TABLE_FULL;
+    Table* table = db->getTable();
+    Cursor* cursor = table->end();
+    
+    if (cursor->row_num >= MAX_ROWS) {
+        return ExcuteResult::EXECUTE_TABLE_FULL;
+    }
+
+    cursor->insert(statement.row_to_insert);
+    delete cursor;
+    return ExcuteResult::EXECUTE_SUCCESS;
 }
 
 ExcuteResult VirtualMachine::executeSelect(const Statement& statement) {
-    db->getTable()->selectAll();
+    Table* table = db->getTable();
+    Cursor* cursor = table->start();
+    while (!cursor->end_of_table) {
+        Row row = cursor->getRow();
+        printRow(row);
+        cursor->advance();
+    }
     return ExcuteResult::EXECUTE_SUCCESS;
 }
