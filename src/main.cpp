@@ -12,7 +12,19 @@ void printPrompt() {
     std::cout << "db > ";
 }
 
+void printConfig() {
+    std::cout << "Row size = " << ROW_SIZE << " bytes" << std::endl;
+    std::cout << "Rows per page = " << ROWS_PER_PAGE << std::endl;
+    std::cout << "Page size = " << PAGE_SIZE << " bytes" << std::endl;
+    std::cout << "Max pages = " << MAX_PAGES << std::endl;
+    std::cout << "Max rows = " << MAX_ROWS << std::endl;
+}
+
 int main(int argc, char* argv[]) {
+    if (argc > 1 && std::string(argv[1]) == "--config") {
+        printConfig();
+        return 0;
+    }
 
     if (argc < 2) {
         std::cerr << "Must supply a database filename." << std::endl;
