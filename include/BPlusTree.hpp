@@ -6,7 +6,7 @@
 
 class BPlusTree {
 public:
-    BPlusTree(const std::string& filename);
+    BPlusTree(Pager* pager, uint32_t root_page_num);
     ~BPlusTree();
 
     Cursor* find(int key);
@@ -16,10 +16,13 @@ public:
     Cursor* begin();
     Cursor* end();
 
-private:
-    void splitNode(uint32_t page_num);
-    void mergeNodes(uint32_t page_num, uint32_t child_page);
-    void redistributeNodes(uint32_t page_num, uint32_t child_page);
-};
+    BPlusNode* getNode(uint32_t page_num);
+    Pager* getPager() { return pager; }
 
+private:
+    BPlusNode* root;
+    Pager* pager;
+
+    void splitChild(BPlusNode* x, uint32_t child_idx);
+};
 #endif // BPLUSTREE_HPP

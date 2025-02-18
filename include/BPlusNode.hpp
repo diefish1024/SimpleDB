@@ -2,14 +2,10 @@
 #define BPLUSNODE_HPP
 
 #include "Row.hpp"
+#include "Pager.hpp"
 #include <cstdint>
 
 const int ORDER = 255;
-
-struct RowLocation {
-    uint32_t page_num;
-    uint32_t offset;
-};
 
 struct BPlusNode {
     bool is_leaf;
@@ -21,8 +17,8 @@ struct BPlusNode {
     int keys[ORDER - 1];
     
     union {
-        uint32_t children[ORDER];
-        RowLocation values[ORDER];
+        uint32_t children[ORDER]; // page numbers of children
+        RowLocation values[ORDER]; // values(locs) of leaf nodes
     };
 };
 
