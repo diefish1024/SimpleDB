@@ -3,24 +3,27 @@
 
 #include "Pager.hpp"
 
-class Table;
+class BPlusTree;
 
 class Cursor {
-public:
-    Table* table;
-    uint32_t page_num;
-    uint32_t cell_num;
-    uint32_t row_num;
-    bool end_of_table;
-
-    explicit Cursor(Table* table);
-    static Cursor* tableStart(Table* table);
-    static Cursor* tableEnd(Table* table);
-
-    void advance();
-    char* value();
-    Row& getRow();
-    void insert(const Row& row);
-};
+    public:
+        Cursor() = delete;
+        
+        void advance();
+        bool end_of_table() const { return is_end; }
+    
+        RowLocation currentLocation() const;
+        Row getRow() const;
+    
+    private:
+        friend class BPlusTree;
+        
+        Cursor(BPlusTree* tree, uint32_t page_num, uint32_t key_idx, bool is_end);
+    
+        BPlusTree* tree;
+        uint32_t current_page;
+        uint32_t current_key_idx;
+        bool is_end = false;
+    };
 
 #endif // CURSOR_HPP

@@ -58,6 +58,14 @@ void* Pager::getPage(uint32_t page_num) {
     return pages[page_num];
 }
 
+Row Pager::getRow(const RowLocation& loc) {
+    if (!loc.isValid()) {
+        return {};
+    }
+    void* page = getPage(loc.page_num);
+    return *reinterpret_cast<Row*>(static_cast<char*>(page) + loc.offset);
+}
+
 void Pager::flush(uint32_t page_num) { // ToDo: fix some bugs here
     if (pages[page_num] == nullptr || !dirty_pages[page_num]) {
         return;

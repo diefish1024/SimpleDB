@@ -18,14 +18,8 @@ friend class Cursor;
 public:
     explicit Table(const std::string& filename, Pager* pager);
     ~Table();
-
-    // bool insertRow(const Row& row);
-    // void selectAll() const;
     
     void flush(); // Ensure all changes are written to disk
-
-    Cursor* start();
-    Cursor* end();
     
 private:
     struct MetaData {
