@@ -58,6 +58,16 @@ void* Pager::getPage(uint32_t page_num) {
     return pages[page_num];
 }
 
+void* Pager::allocatePage() {
+    for (uint32_t i = 0; i < MAX_PAGES; i++) {
+        if (pages[i] == nullptr) {
+            pages[i] = new char[PAGE_SIZE];
+            return pages[i];
+        }
+    }
+    throw std::runtime_error("No free pages available");
+}
+
 Row Pager::getRow(const RowLocation& loc) {
     if (!loc.isValid()) {
         return {};

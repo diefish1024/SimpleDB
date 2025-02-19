@@ -14,6 +14,8 @@ struct BPlusNode {
     uint32_t next;
     uint32_t prev;
 
+    uint32_t page_num;
+
     int keys[ORDER - 1];
     
     union {

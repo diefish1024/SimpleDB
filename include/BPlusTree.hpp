@@ -10,7 +10,7 @@ public:
     ~BPlusTree();
 
     Cursor* find(int key);
-    void insert(int key, const RowLocation& value);
+    bool insert(int key, const RowLocation& value);
     void remove(int key);
 
     Cursor* begin();
