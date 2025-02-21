@@ -23,12 +23,13 @@ public:
     std::fstream file;
     uint32_t file_length;
     void* pages[MAX_PAGES];
+    uint32_t tot_pages;
 
     explicit Pager(const std::string& filename);
     ~Pager();
 
     void* getPage(uint32_t page_num); // Read a page from disk
-    void* allocatePage(); // Allocate a new page
+    uint32_t newPage(); // Allocate a new page
     Row getRow(const RowLocation& loc);
     void flush(uint32_t page_num); // Write a page to disk
     void markDirty(uint32_t page_num); // Mark a page as dirty

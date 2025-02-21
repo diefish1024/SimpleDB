@@ -18,24 +18,8 @@ ExcuteResult VirtualMachine::run(const Statement& statement) {
 
 ExcuteResult VirtualMachine::executeInsert(const Statement& statement) {
     Table* table = db->getTable();
-    Cursor* cursor = table->end();
-    
-    if (cursor->row_num >= MAX_ROWS) {
-        return ExcuteResult::EXECUTE_TABLE_FULL;
-    }
-
-    cursor->insert(statement.row_to_insert);
-    delete cursor;
-    return ExcuteResult::EXECUTE_SUCCESS;
+    Row row = statement.row_to_insert;
 }
 
 ExcuteResult VirtualMachine::executeSelect(const Statement& statement) {
-    Table* table = db->getTable();
-    Cursor* cursor = table->start();
-    while (!cursor->end_of_table) {
-        Row row = cursor->getRow();
-        printRow(row);
-        cursor->advance();
-    }
-    return ExcuteResult::EXECUTE_SUCCESS;
 }

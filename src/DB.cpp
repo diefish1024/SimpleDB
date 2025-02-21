@@ -12,7 +12,7 @@ DB::~DB() {
 void DB::open(const std::string& filename) {
     close();
     pager = new Pager(filename);
-    table = new Table(filename, pager);
+    table = new Table(pager);
 }
 
 void DB::close() {

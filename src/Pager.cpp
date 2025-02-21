@@ -15,6 +15,8 @@ Pager::Pager(const std::string& filename) {
     file_length = file.tellg();
     file.clear();
 
+    tot_pages = file_length / PAGE_SIZE;
+
     for (uint32_t i = 0; i < MAX_PAGES; i++) {
         pages[i] = nullptr;
         dirty_pages[i] = false;
@@ -39,7 +41,6 @@ void* Pager::getPage(uint32_t page_num) {
 
     if (pages[page_num] == nullptr) {
         pages[page_num] = new char[PAGE_SIZE];
-        uint32_t tot_pages = file_length / PAGE_SIZE;
         if (file_length % PAGE_SIZE) {
             tot_pages++;
         }
@@ -53,19 +54,29 @@ void* Pager::getPage(uint32_t page_num) {
         } else {
             memset(pages[page_num], 0, PAGE_SIZE);
             file_length = PAGE_SIZE * (page_num + 1);
+            tot_pages = page_num + 1;
         }
     }
     return pages[page_num];
 }
 
-void* Pager::allocatePage() {
-    for (uint32_t i = 0; i < MAX_PAGES; i++) {
-        if (pages[i] == nullptr) {
-            pages[i] = new char[PAGE_SIZE];
-            return pages[i];
-        }
+uint32_t Pager::newPage() {
+    if (tot_pages >= MAX_PAGES) {
+        throw std::runtime_error("Maximum number of pages reached.");
     }
-    throw std::runtime_error("No free pages available");
+
+    tot_pages++;
+
+    // Extend file size to accommodate the new page if necessary
+    uint32_t required_file_length = tot_pages * PAGE_SIZE;
+    if (file_length < required_file_length) {
+        file.clear();
+        file.seekp(required_file_length - 1);
+        file.write("\0", 1); // Extend file by one byte to ensure space for the new page
+        file_length = required_file_length; // Update file_length
+    }
+
+    return tot_pages;
 }
 
 Row Pager::getRow(const RowLocation& loc) {

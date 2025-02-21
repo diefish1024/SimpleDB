@@ -5,12 +5,14 @@
 #include <fstream>
 #include <cstring>
 
-Table::Table(const std::string& filename, Pager* pager) : pager(pager) {
+Table::Table(Pager* pager) : pager(pager) {
     loadMetaData();
+    tree = new BPlusTree(pager, meta.ROOT_PAGE_NUM);
 }
 
 Table::~Table() {
     flush();
+    delete tree;
 }
 
 void Table::loadMetaData() {
@@ -30,6 +32,7 @@ void Table::loadMetaData() {
 
     if (pager->file_length == (METADATA_PAGE_NUM + 1) * PAGE_SIZE) {
         meta.NUM_ROWS = 0;
+        meta.ROOT_PAGE_NUM = 1;
         storeMetaData();
     }
 }
@@ -49,4 +52,19 @@ void Table::flush() {
     for (uint32_t i = 0; i < MAX_PAGES; ++i) {
         pager->flush(i);
     }
+}
+
+bool Table::insertRow(const Row& row) {
+    uint32_t key = row.id;
+    RowLocation value = {pager->newPage(), meta.NUM_ROWS % ROWS_PER_PAGE * ROW_SIZE};
+
+    void* page = pager->getPage(value.page_num);
+    std::memcpy(static_cast<char*>(page) + value.offset, &row, ROW_SIZE);
+
+    if (!tree->insert(key, value)) {
+        return false;
+    }
+    meta.NUM_ROWS++;
+    storeMetaData();
+    return true;
 }
