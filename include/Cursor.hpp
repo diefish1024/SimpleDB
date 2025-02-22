@@ -10,7 +10,7 @@ class Cursor {
         Cursor() = delete;
         
         void advance();
-        bool end_of_table() const { return is_end; }
+        bool isEnd() const { return is_end; }
     
         RowLocation currentLocation() const;
         Row getRow() const;

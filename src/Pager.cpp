@@ -39,12 +39,15 @@ void* Pager::getPage(uint32_t page_num) {
         throw std::runtime_error("Page number out of bounds");
     }
 
+    // std::cout << "Getting page " << page_num << std::endl;
+    // std::cout << "Total pages: " << tot_pages << std::endl;
+
     if (pages[page_num] == nullptr) {
         pages[page_num] = new char[PAGE_SIZE];
-        if (file_length % PAGE_SIZE) {
-            tot_pages++;
-        }
-        if (tot_pages >= page_num) { // Page exists in file
+        // if (file_length % PAGE_SIZE) {
+        //     tot_pages++;
+        // }
+        if (tot_pages > page_num) { // Page exists in file
             file.seekg(page_num * PAGE_SIZE);
             file.read(static_cast<char*>(pages[page_num]), PAGE_SIZE);
             if (file.fail()) {

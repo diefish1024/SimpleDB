@@ -11,6 +11,10 @@ BPlusTree::BPlusTree(Pager* pager, uint32_t root_page_num)
     root = getNode(root_page_num);
 }
 
+BPlusTree::~BPlusTree() {
+    delete root;
+}
+
 Cursor* BPlusTree::find(int key) {
     BPlusNode* node = root;
     while (!node->is_leaf) {
@@ -29,6 +33,10 @@ Cursor* BPlusTree::find(int key) {
 bool BPlusTree::insert(int key, const RowLocation& value) {
     BPlusNode* x = root;
     BPlusNode* y = nullptr;
+
+    // DEBUG
+    // std::cout << "Root page num: " << root->page_num << std::endl;
+
     while (!x->is_leaf) {
         uint32_t child_index =
             std::upper_bound(x->keys, x->keys + x->num_keys, key) - x->keys;

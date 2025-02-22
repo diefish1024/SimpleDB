@@ -19,7 +19,16 @@ ExcuteResult VirtualMachine::run(const Statement& statement) {
 ExcuteResult VirtualMachine::executeInsert(const Statement& statement) {
     Table* table = db->getTable();
     Row row = statement.row_to_insert;
+    if (table->insertRow(row)) {
+        return ExcuteResult::EXECUTE_SUCCESS;
+    }
+    return ExcuteResult::EXECUTE_TABLE_FULL;
 }
 
 ExcuteResult VirtualMachine::executeSelect(const Statement& statement) {
+    // print all rows
+    Table* table = db->getTable();
+    table->selectAll();
+    return ExcuteResult::EXECUTE_SUCCESS;
+
 }

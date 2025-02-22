@@ -7,7 +7,16 @@
 
 Table::Table(Pager* pager) : pager(pager) {
     loadMetaData();
+    uint32_t root_page_num = meta.ROOT_PAGE_NUM;
     tree = new BPlusTree(pager, meta.ROOT_PAGE_NUM);
+    BPlusNode* root = tree->getNode(root_page_num);
+    root->is_leaf = true;
+    root->num_keys = 0;
+    root->parent = 0;
+    root->next = 0;
+    root->prev = 0;
+    root->page_num = root_page_num;
+    pager->flush(root_page_num);
 }
 
 Table::~Table() {
@@ -30,8 +39,11 @@ void Table::loadMetaData() {
     void* meta_page = pager->getPage(METADATA_PAGE_NUM);
     std::memcpy(&meta, static_cast<char*>(meta_page) + METADATA_OFFSET, METADATA_SIZE);
 
-    if (pager->file_length == (METADATA_PAGE_NUM + 1) * PAGE_SIZE) {
+    if (pager->tot_pages == METADATA_PAGE_NUM + 1) {
         meta.NUM_ROWS = 0;
+        
+        // uint32_t root_page_num = pager->newPage();
+        // meta.ROOT_PAGE_NUM = root_page_num;
         meta.ROOT_PAGE_NUM = 1;
         storeMetaData();
     }
@@ -60,6 +72,7 @@ bool Table::insertRow(const Row& row) {
 
     void* page = pager->getPage(value.page_num);
     std::memcpy(static_cast<char*>(page) + value.offset, &row, ROW_SIZE);
+    pager->markDirty(value.page_num);
 
     if (!tree->insert(key, value)) {
         return false;
@@ -67,4 +80,13 @@ bool Table::insertRow(const Row& row) {
     meta.NUM_ROWS++;
     storeMetaData();
     return true;
+}
+
+void Table::selectAll() {
+    Cursor* cursor = tree->begin();
+    while (!cursor->isEnd()) {
+        printRow(cursor->getRow());
+        cursor->advance();
+    }
+    delete cursor;
 }
