@@ -1,4 +1,4 @@
 build
 .vscode
 myDB.db
-test.db
+test.*

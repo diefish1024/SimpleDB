@@ -11,9 +11,7 @@ BPlusTree::BPlusTree(Pager* pager, uint32_t root_page_num)
     root = getNode(root_page_num);
 }
 
-BPlusTree::~BPlusTree() {
-    delete root;
-}
+BPlusTree::~BPlusTree() = default; // don't need to delete root
 
 Cursor* BPlusTree::find(int key) {
     BPlusNode* node = root;

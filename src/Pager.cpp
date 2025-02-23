@@ -26,7 +26,6 @@ Pager::Pager(const std::string& filename) {
 Pager::~Pager() {
     for (uint32_t i = 0; i < MAX_PAGES; i++) {
         if (pages[i] != nullptr) {
-            flush(i);
             delete[] static_cast<char*>(pages[i]);
             pages[i] = nullptr;
         }
@@ -133,7 +132,6 @@ void Pager::flush(uint32_t page_num) { // ToDo: fix some bugs here
         throw std::runtime_error("Error writing to file");
     }
 }
-
 
 void Pager::markDirty(uint32_t page_num) {
     dirty_pages[page_num] = true;
