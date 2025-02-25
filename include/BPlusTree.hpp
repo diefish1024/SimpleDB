@@ -18,11 +18,16 @@ public:
 
     BPlusNode* getNode(uint32_t page_num);
     Pager* getPager() { return pager; }
+    BPlusNode* initNewNode(uint32_t page_num);
+
+    void printTree();
 
 private:
     BPlusNode* root;
     Pager* pager;
 
     void splitChild(BPlusNode* x, uint32_t child_idx);
+
+    void printNode(BPlusNode* node, int indent);
 };
 #endif // BPLUSTREE_HPP

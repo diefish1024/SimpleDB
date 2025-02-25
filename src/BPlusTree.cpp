@@ -1,9 +1,28 @@
 #include "BPlusTree.hpp"
 #include <iostream>
 #include <algorithm>
+#include <iomanip>
+#include <cstring>
 
 BPlusNode* BPlusTree::getNode(uint32_t page_num) {
     return static_cast<BPlusNode*>(pager->getPage(page_num));
+}
+
+BPlusNode* BPlusTree::initNewNode(uint32_t page_num) {
+    BPlusNode* node = getNode(page_num);
+
+    node->is_leaf = true;
+    node->num_keys = 0;
+    node->parent = 0;
+    node->next = 0;
+    node->prev = 0;
+    node->page_num = page_num;
+    std::memset(node->keys, 0, sizeof(node->keys));
+    std::memset(node->children, 0, sizeof(node->children));
+    std::memset(node->values, 0, sizeof(node->values));
+
+    pager->markDirty(page_num);
+    return node;
 }
 
 BPlusTree::BPlusTree(Pager* pager, uint32_t root_page_num)
@@ -65,7 +84,7 @@ bool BPlusTree::insert(int key, const RowLocation& value) {
 
 void BPlusTree::splitChild(BPlusNode* x, uint32_t child_idx) {
     uint32_t tot_pages = pager->file_length / PAGE_SIZE;
-    BPlusNode* z = getNode(tot_pages + 1);
+    BPlusNode* z = getNode(tot_pages);
     BPlusNode* y = getNode(x->children[child_idx]);
     z->is_leaf = y->is_leaf;
     z->num_keys = ORDER / 2;
@@ -78,7 +97,7 @@ void BPlusTree::splitChild(BPlusNode* x, uint32_t child_idx) {
         for (int i = 0; i <= z->num_keys; ++i) {
             z->children[i] = y->children[i + ORDER / 2];
             BPlusNode* child = getNode(z->children[i]);
-            child->parent = tot_pages + 1;
+            child->parent = tot_pages;
             pager->markDirty(z->children[i]);
         }
     }
@@ -88,9 +107,9 @@ void BPlusTree::splitChild(BPlusNode* x, uint32_t child_idx) {
         x->children[i + 1] = x->children[i];
     }
     x->keys[child_idx] = y->keys[ORDER / 2 - 1];
-    x->children[child_idx + 1] = tot_pages + 1;
+    x->children[child_idx + 1] = tot_pages;
     x->num_keys++;
-    pager->markDirty(x->parent);
+    pager->markDirty(x->page_num);
 }
 
 Cursor* BPlusTree::begin() {
@@ -109,3 +128,47 @@ Cursor* BPlusTree::end() {
     return new Cursor(this, node->page_num, node->num_keys, true);
 }
 
+void BPlusTree::printTree() {
+    std::cout << "B+ Tree Structure:\n";
+    printNode(root, 0);
+}
+
+void BPlusTree::printNode(BPlusNode* node, int indent) {
+    if (node == nullptr)
+        return;
+
+    std::cout << std::setw(indent * 4) << "" << "Page: " << node->page_num
+              << ", Leaf: " << (node->is_leaf ? "Yes" : "No")
+              << ", Keys: [";
+    for (int i = 0; i < node->num_keys; ++i) {
+        std::cout << node->keys[i];
+        if (i < node->num_keys - 1)
+            std::cout << ", ";
+    }
+    std::cout << "], Children: [";
+    if (!node->is_leaf) {
+        for (int i = 0; i <= node->num_keys; ++i) {
+            std::cout << node->children[i];
+            if (i < node->num_keys)
+                std::cout << ", ";
+        }
+    } else {
+        for (int i = 0; i < node->num_keys; ++i) {
+            std::cout << "Value@" << node->values[i].page_num << ":" << node->values[i].offset;
+            if (i < node->num_keys - 1)
+                std::cout << ", ";
+        }
+    }
+    std::cout << "]" << std::endl;
+
+    if (!node->is_leaf) {
+        for (int i = 0; i <= node->num_keys; ++i) {
+            BPlusNode* child = getNode(node->children[i]);
+            if (child != nullptr) {
+                printNode(child, indent + 1);
+            } else {
+                std::cout << std::setw((indent + 1) * 4) << "" << "Child Page: " << node->children[i] << " is nullptr" << std::endl;
+            }
+        }
+    }
+}

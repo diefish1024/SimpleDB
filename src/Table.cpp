@@ -7,20 +7,33 @@
 
 Table::Table(Pager* pager) : pager(pager) {
     loadMetaData();
-    uint32_t root_page_num = meta.ROOT_PAGE_NUM;
-    tree = new BPlusTree(pager, meta.ROOT_PAGE_NUM);
+    uint32_t root_page_num = ROOT_PAGE_NUM;
+    tree = new BPlusTree(pager, root_page_num);
     BPlusNode* root = tree->getNode(root_page_num);
-    root->is_leaf = true;
-    root->num_keys = 0;
-    root->parent = 0;
-    root->next = 0;
-    root->prev = 0;
-    root->page_num = root_page_num;
-    pager->flush(root_page_num);
+    if (pager->tot_pages == root_page_num + 1) {
+        root->is_leaf = true;
+        root->num_keys = 0;
+        root->parent = 0;
+        root->next = 0;
+        root->prev = 0;
+        root->page_num = root_page_num;
+        pager->flush(root_page_num);
+    }
+    // Print the root node
+    // BPlusNode* node = tree->getNode(root_page_num);
+    // std::cout << "is_leaf: " << node->is_leaf << std::endl;
+    // std::cout << "num_keys: " << node->num_keys << std::endl;
+    // std::cout << "parent: " << node->parent << std::endl;
+    // std::cout << "next: " << node->next << std::endl;
+    // std::cout << "prev: " << node->prev << std::endl;
+    // std::cout << "Root node: " << node->page_num << std::endl;
+    // for (int i = 0; i < node->num_keys; ++i) {
+    //     std::cout << "key: " << node->keys[i] << std::endl;
+    //     std::cout << "value: " << node->values[i].page_num << " " << node->values[i].offset << std::endl;
+    // }
 }
 
 Table::~Table() {
-    flush();
     delete tree;
 }
 
@@ -41,10 +54,6 @@ void Table::loadMetaData() {
 
     if (pager->tot_pages == METADATA_PAGE_NUM + 1) {
         meta.NUM_ROWS = 0;
-        
-        // uint32_t root_page_num = pager->newPage();
-        // meta.ROOT_PAGE_NUM = root_page_num;
-        meta.ROOT_PAGE_NUM = 1;
         storeMetaData();
     }
 }
@@ -79,10 +88,13 @@ bool Table::insertRow(const Row& row) {
     }
     meta.NUM_ROWS++;
     storeMetaData();
+
+    // tree->printTree();
     return true;
 }
 
 void Table::selectAll() {
+    // tree->printTree();
     Cursor* cursor = tree->begin();
     while (!cursor->isEnd()) {
         printRow(cursor->getRow());

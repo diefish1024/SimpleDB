@@ -78,7 +78,7 @@ uint32_t Pager::newPage() {
         file_length = required_file_length; // Update file_length
     }
 
-    return tot_pages;
+    return tot_pages - 1;
 }
 
 Row Pager::getRow(const RowLocation& loc) {

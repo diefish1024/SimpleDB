@@ -26,6 +26,9 @@ int main(int argc, char* argv[]) {
         return 0;
     }
 
+    // freopen("test.in", "r", stdin);
+    // freopen("test.out", "w", stdout);
+
     if (argc < 2) {
         std::cerr << "Must supply a database filename." << std::endl;
         return 1;
@@ -34,6 +37,7 @@ int main(int argc, char* argv[]) {
     InputBuffer input_buffer;
 
     std::string filename(argv[1]);
+    // std::string filename = "test.db";
     DB db(filename);
     VirtualMachine vm(&db);
 
