@@ -7,7 +7,7 @@
 #include <vector>
 #include <cstdint>
 
-const uint32_t MAX_ROWS = (MAX_PAGES - 1) * ROWS_PER_PAGE;
+const uint32_t MAX_ROWS = 10000;
 const uint32_t METADATA_PAGE_NUM = 0;
 const uint32_t METADATA_OFFSET = 0;
 const uint32_t MAX_META_PAGES = 1;
@@ -30,6 +30,8 @@ private:
     #pragma pack(push, 1)
     struct MetaData {
         uint32_t NUM_ROWS;
+        uint32_t LAST_DATA_PAGE;
+        uint32_t ROWS_IN_LAST_PAGE;
     } meta;
     #pragma pack(pop)
     static const uint32_t METADATA_SIZE = sizeof(MetaData);

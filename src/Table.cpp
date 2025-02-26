@@ -54,6 +54,8 @@ void Table::loadMetaData() {
 
     if (pager->tot_pages == METADATA_PAGE_NUM + 1) {
         meta.NUM_ROWS = 0;
+        meta.LAST_DATA_PAGE = 2;
+        meta.ROWS_IN_LAST_PAGE = 0;
         storeMetaData();
     }
 }
@@ -77,7 +79,17 @@ void Table::flush() {
 
 bool Table::insertRow(const Row& row) {
     uint32_t key = row.id;
-    RowLocation value = {pager->newPage(), meta.NUM_ROWS % ROWS_PER_PAGE * ROW_SIZE};
+
+    uint32_t page_num;
+    if (meta.ROWS_IN_LAST_PAGE >= ROWS_PER_PAGE) {
+        page_num = pager->newPage();
+        meta.LAST_DATA_PAGE = page_num;
+        meta.ROWS_IN_LAST_PAGE = 0;
+    } else {
+        page_num = meta.LAST_DATA_PAGE;
+    }
+
+    RowLocation value = {page_num, meta.NUM_ROWS % ROWS_PER_PAGE * ROW_SIZE};
 
     void* page = pager->getPage(value.page_num);
     std::memcpy(static_cast<char*>(page) + value.offset, &row, ROW_SIZE);
