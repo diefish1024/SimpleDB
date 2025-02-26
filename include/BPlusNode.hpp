@@ -3,9 +3,8 @@
 
 #include "Row.hpp"
 #include "Pager.hpp"
+#include "Constants.hpp"
 #include <cstdint>
-
-const int ORDER = 255;
 
 struct BPlusNode {
     bool is_leaf;
@@ -16,11 +15,11 @@ struct BPlusNode {
 
     uint32_t page_num;
 
-    int keys[ORDER - 1];
+    int keys[Constants::ORDER- 1];
     
     union {
-        uint32_t children[ORDER]; // page numbers of children
-        RowLocation values[ORDER]; // values(locs) of leaf nodes
+        uint32_t children[Constants::ORDER]; // page numbers of children
+        RowLocation values[Constants::ORDER]; // values(locs) of leaf nodes
     };
 };
 

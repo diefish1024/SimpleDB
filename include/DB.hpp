@@ -1,9 +1,9 @@
 #ifndef DB_HPP
 #define DB_HPP
 
-#include <string>
 #include "Pager.hpp"
 #include "Table.hpp"
+#include <string>
 
 class DB {
 private:

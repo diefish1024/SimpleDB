@@ -19,18 +19,6 @@ Table::Table(Pager* pager) : pager(pager) {
         root->page_num = root_page_num;
         pager->flush(root_page_num);
     }
-    // Print the root node
-    // BPlusNode* node = tree->getNode(root_page_num);
-    // std::cout << "is_leaf: " << node->is_leaf << std::endl;
-    // std::cout << "num_keys: " << node->num_keys << std::endl;
-    // std::cout << "parent: " << node->parent << std::endl;
-    // std::cout << "next: " << node->next << std::endl;
-    // std::cout << "prev: " << node->prev << std::endl;
-    // std::cout << "Root node: " << node->page_num << std::endl;
-    // for (int i = 0; i < node->num_keys; ++i) {
-    //     std::cout << "key: " << node->keys[i] << std::endl;
-    //     std::cout << "value: " << node->values[i].page_num << " " << node->values[i].offset << std::endl;
-    // }
 }
 
 Table::~Table() {
@@ -72,7 +60,7 @@ void Table::storeMetaData() {
 void Table::flush() {
     storeMetaData();
 
-    for (uint32_t i = 0; i < MAX_PAGES; ++i) {
+    for (uint32_t i = 0; i < Constants::MAX_PAGES; ++i) {
         pager->flush(i);
     }
 }
@@ -81,7 +69,7 @@ bool Table::insertRow(const Row& row) {
     uint32_t key = row.id;
 
     uint32_t page_num;
-    if (meta.ROWS_IN_LAST_PAGE >= ROWS_PER_PAGE) {
+    if (meta.ROWS_IN_LAST_PAGE >= Constants::ROWS_PER_PAGE) {
         page_num = pager->newPage();
         meta.LAST_DATA_PAGE = page_num;
         meta.ROWS_IN_LAST_PAGE = 0;
@@ -89,10 +77,10 @@ bool Table::insertRow(const Row& row) {
         page_num = meta.LAST_DATA_PAGE;
     }
 
-    RowLocation value = {page_num, meta.NUM_ROWS % ROWS_PER_PAGE * ROW_SIZE};
+    RowLocation value = {page_num, meta.NUM_ROWS % Constants::ROWS_PER_PAGE * Constants::ROW_SIZE};
 
     void* page = pager->getPage(value.page_num);
-    std::memcpy(static_cast<char*>(page) + value.offset, &row, ROW_SIZE);
+    std::memcpy(static_cast<char*>(page) + value.offset, &row, Constants::ROW_SIZE);
     pager->markDirty(value.page_num);
 
     if (!tree->insert(key, value)) {

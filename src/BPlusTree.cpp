@@ -74,7 +74,7 @@ bool BPlusTree::insert(int key, const RowLocation& value) {
     x->values[idx] = value;
     x->num_keys++;
     pager->markDirty(x->page_num);
-    if (x->num_keys == ORDER - 1) {
+    if (x->num_keys == Constants::ORDER - 1) {
         uint32_t child_idx =
             std::upper_bound(y->keys, y->keys + y->num_keys, key) - y->keys;
         splitChild(y, child_idx);
@@ -83,30 +83,30 @@ bool BPlusTree::insert(int key, const RowLocation& value) {
 }
 
 void BPlusTree::splitChild(BPlusNode* x, uint32_t child_idx) {
-    uint32_t tot_pages = pager->file_length / PAGE_SIZE;
+    uint32_t tot_pages = pager->file_length / Constants::PAGE_SIZE;
     BPlusNode* z = getNode(tot_pages);
     BPlusNode* y = getNode(x->children[child_idx]);
     z->is_leaf = y->is_leaf;
-    z->num_keys = ORDER / 2;
+    z->num_keys = Constants::ORDER / 2;
     z->parent = x->parent;
     for (int i = 0; i < z->num_keys; ++i) {
-        z->keys[i] = y->keys[i + ORDER / 2];
-        z->values[i] = y->values[i + ORDER / 2];
+        z->keys[i] = y->keys[i + Constants::ORDER / 2];
+        z->values[i] = y->values[i + Constants::ORDER / 2];
     }
     if (!y->is_leaf) {
         for (int i = 0; i <= z->num_keys; ++i) {
-            z->children[i] = y->children[i + ORDER / 2];
+            z->children[i] = y->children[i + Constants::ORDER / 2];
             BPlusNode* child = getNode(z->children[i]);
             child->parent = tot_pages;
             pager->markDirty(z->children[i]);
         }
     }
-    y->num_keys = ORDER / 2;
+    y->num_keys = Constants::ORDER / 2;
     for (int i = x->num_keys; i > child_idx; --i) {
         x->keys[i] = x->keys[i - 1];
         x->children[i + 1] = x->children[i];
     }
-    x->keys[child_idx] = y->keys[ORDER / 2 - 1];
+    x->keys[child_idx] = y->keys[Constants::ORDER / 2 - 1];
     x->children[child_idx + 1] = tot_pages;
     x->num_keys++;
     pager->markDirty(x->page_num);

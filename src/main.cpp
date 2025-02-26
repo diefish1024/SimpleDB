@@ -4,6 +4,7 @@
 #include "VirtualMachine.hpp"
 #include "MetaCommand.hpp"
 #include "DB.hpp"
+#include "Constants.hpp"
 #include <iostream>
 #include <string>
 #include <sstream>
@@ -13,11 +14,26 @@ void printPrompt() {
 }
 
 void printConfig() {
-    std::cout << "ROW_SIZE = " << ROW_SIZE << " bytes" << std::endl;
-    std::cout << "ROWS_PER_PAGE = " << ROWS_PER_PAGE << std::endl;
-    std::cout << "PAGE_SIZE = " << PAGE_SIZE << " bytes" << std::endl;
-    std::cout << "MAX_PAGES = " << MAX_PAGES << std::endl;
-    std::cout << "MAX_ROWS = " << MAX_ROWS << std::endl;
+    std::cout << "--- Configuration ---" << std::endl;
+    std::cout << "ROW_SIZE = " << Constants::ROW_SIZE << " bytes" << std::endl;
+    std::cout << "ROWS_PER_PAGE = " << Constants::ROWS_PER_PAGE << std::endl;
+    std::cout << "PAGE_SIZE = " << Constants::PAGE_SIZE << " bytes" << std::endl;
+    std::cout << "MAX_PAGES = " << Constants::MAX_PAGES << std::endl;
+    std::cout << "MAX_ROWS = " << Constants::MAX_ROWS << std::endl;
+    std::cout << std::endl;
+
+    std::cout << "COLUMN_USERNAME_MAX_LENGTH = " << Constants::COLUMN_USERNAME_MAX_LENGTH << " bytes" << std::endl;
+    std::cout << "COLUMN_EMAIL_MAX_LENGTH = " << Constants::COLUMN_EMAIL_MAX_LENGTH << " bytes" << std::endl;
+    std::cout << std::endl;
+
+    std::cout << "METADATA_PAGE_NUM = " << Constants::METADATA_PAGE_NUM << std::endl;
+    std::cout << "METADATA_OFFSET = " << Constants::METADATA_OFFSET << std::endl;
+    std::cout << "MAX_META_PAGES = " << Constants::MAX_META_PAGES << std::endl;
+    std::cout << "ROOT_PAGE_NUM = " << Constants::ROOT_PAGE_NUM << std::endl;
+    std::cout << std::endl;
+
+    std::cout << "B+TREE ORDER = " << Constants::ORDER << std::endl;
+    std::cout << "--- End Configuration ---" << std::endl;
 }
 
 int main(int argc, char* argv[]) {
