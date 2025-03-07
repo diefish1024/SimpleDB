@@ -29,7 +29,6 @@ void printConfig() {
     std::cout << "METADATA_PAGE_NUM = " << Constants::METADATA_PAGE_NUM << std::endl;
     std::cout << "METADATA_OFFSET = " << Constants::METADATA_OFFSET << std::endl;
     std::cout << "MAX_META_PAGES = " << Constants::MAX_META_PAGES << std::endl;
-    std::cout << "ROOT_PAGE_NUM = " << Constants::ROOT_PAGE_NUM << std::endl;
     std::cout << std::endl;
 
     std::cout << "B+TREE ORDER = " << Constants::ORDER << std::endl;

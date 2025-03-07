@@ -7,10 +7,11 @@
 
 Table::Table(Pager* pager) : pager(pager) {
     loadMetaData();
-    uint32_t root_page_num = ROOT_PAGE_NUM;
+    bool is_new = pager->tot_pages == Constants::METADATA_PAGE_NUM + 1;
+    uint32_t root_page_num = meta.ROOT_PAGE_NUM;
     tree = new BPlusTree(pager, root_page_num);
     BPlusNode* root = tree->getNode(root_page_num);
-    if (pager->tot_pages == root_page_num + 1) {
+    if (is_new) {
         root->is_leaf = true;
         root->num_keys = 0;
         root->parent = 0;
@@ -19,6 +20,7 @@ Table::Table(Pager* pager) : pager(pager) {
         root->page_num = root_page_num;
         pager->flush(root_page_num);
     }
+    // tree->printTree();
 }
 
 Table::~Table() {
@@ -37,13 +39,14 @@ void Table::loadMetaData() {
      *    std::memcpy(&meta, meta_buffer + METADATA_OFFSET, METADATA_SIZE);
      *    delete[] meta_buffer;
      */
-    void* meta_page = pager->getPage(METADATA_PAGE_NUM);
-    std::memcpy(&meta, static_cast<char*>(meta_page) + METADATA_OFFSET, METADATA_SIZE);
+    void* meta_page = pager->getPage(Constants::METADATA_PAGE_NUM);
+    std::memcpy(&meta, static_cast<char*>(meta_page) + Constants::METADATA_OFFSET, METADATA_SIZE);
 
-    if (pager->tot_pages == METADATA_PAGE_NUM + 1) {
+    if (pager->tot_pages == Constants::METADATA_PAGE_NUM + 1) {
         meta.NUM_ROWS = 0;
         meta.LAST_DATA_PAGE = 2;
         meta.ROWS_IN_LAST_PAGE = 0;
+        meta.ROOT_PAGE_NUM = 1;
         storeMetaData();
     }
 }
@@ -52,9 +55,9 @@ void Table::storeMetaData() {
     /*
      * if there multiple metadata pages, we do as loadaMetaData does.
      */
-    void* meta_page = pager->getPage(METADATA_PAGE_NUM);
-    std::memcpy(static_cast<char*>(meta_page) + METADATA_OFFSET, &meta, METADATA_SIZE);
-    pager->markDirty(METADATA_PAGE_NUM);
+    void* meta_page = pager->getPage(Constants::METADATA_PAGE_NUM);
+    std::memcpy(static_cast<char*>(meta_page) + Constants::METADATA_OFFSET, &meta, METADATA_SIZE);
+    pager->markDirty(Constants::METADATA_PAGE_NUM);
 }
 
 void Table::flush() {
@@ -66,6 +69,9 @@ void Table::flush() {
 }
 
 bool Table::insertRow(const Row& row) {
+    if (meta.NUM_ROWS == Constants::MAX_ROWS) {
+        return false;
+    }
     uint32_t key = row.id;
 
     uint32_t page_num;
@@ -86,6 +92,7 @@ bool Table::insertRow(const Row& row) {
     if (!tree->insert(key, value)) {
         return false;
     }
+    meta.ROOT_PAGE_NUM = tree->getRootPageNum();
     meta.NUM_ROWS++;
     storeMetaData();
 

@@ -22,11 +22,15 @@ public:
 
     void printTree();
 
+    uint32_t getRootPageNum() const { return root->page_num; }
+
 private:
     BPlusNode* root;
     Pager* pager;
 
-    void splitChild(BPlusNode* x, uint32_t child_idx);
+    void insertNonFull(BPlusNode* node, int key, uint32_t childPageNum);
+    void splitNode(BPlusNode* node, BPlusNode* parent);
+    void splitRoot(BPlusNode* oldRoot, int promotedKey, BPlusNode* newNode);
 
     void printNode(BPlusNode* node, int indent);
 };

@@ -5,7 +5,7 @@
 
 Cursor::Cursor(BPlusTree* tree, uint32_t page_num, uint32_t key_idx, bool is_end)
     : tree(tree), current_page(page_num), current_key_idx(key_idx), is_end(is_end) {
-    if (page_num >= MAX_META_PAGES) {
+    if (page_num >= Constants::MAX_META_PAGES) {
         BPlusNode* node = tree->getNode(page_num);
         if (node->num_keys == 0) this->is_end = true;
     }

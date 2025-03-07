@@ -45,11 +45,11 @@ Pager::~Pager() {
 }
 
 void* Pager::getPage(uint32_t page_num) {
+    // std::cout << "Getting page " << page_num << std::endl;
     if (page_num >= Constants::MAX_PAGES) {
         throw std::runtime_error("Page number out of bounds");
     }
 
-    // std::cout << "Getting page " << page_num << std::endl;
     // std::cout << "Total pages: " << tot_pages << std::endl;
 
     if (pages[page_num] == nullptr) {
