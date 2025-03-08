@@ -20,7 +20,10 @@ Table::Table(Pager* pager) : pager(pager) {
         root->page_num = root_page_num;
         pager->flush(root_page_num);
     }
-    // tree->printTree();
+
+    if (isDebugMode) {
+        tree->printTree();
+    }
 }
 
 Table::~Table() {
@@ -96,12 +99,16 @@ bool Table::insertRow(const Row& row) {
     meta.NUM_ROWS++;
     storeMetaData();
 
-    // tree->printTree();
+    if (isDebugMode) {
+        tree->printTree();
+    }
     return true;
 }
 
 void Table::selectAll() {
-    // tree->printTree();
+    if (isDebugMode) {
+        tree->printTree();
+    }
     Cursor* cursor = tree->begin();
     while (!cursor->isEnd()) {
         printRow(cursor->getRow());

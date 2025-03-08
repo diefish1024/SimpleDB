@@ -54,9 +54,6 @@ void* Pager::getPage(uint32_t page_num) {
 
     if (pages[page_num] == nullptr) {
         pages[page_num] = new char[Constants::PAGE_SIZE];
-        // if (file_length % Constants::PAGE_SIZE) {
-        //     tot_pages++;
-        // }
         if (tot_pages > page_num) { // Page exists in file
             file.seekg(page_num * Constants::PAGE_SIZE);
             file.read(static_cast<char*>(pages[page_num]), Constants::PAGE_SIZE);
@@ -100,41 +97,20 @@ Row Pager::getRow(const RowLocation& loc) {
     return *reinterpret_cast<Row*>(static_cast<char*>(page) + loc.offset);
 }
 
-void Pager::flush(uint32_t page_num) { // ToDo: fix some bugs here
+void Pager::flush(uint32_t page_num) {
     if (pages[page_num] == nullptr || !dirty_pages[page_num]) {
         return;
     }
-    // std::cout << "Flushing page " << page_num << std::endl;
 
     // Ensure file is open
     if (!file.is_open()) {
         throw std::runtime_error("File is not open");
     }
-
-    // Seek to the end to get the file size
-    // file.clear();
-    // file.seekp(0, std::ios::end);
-    // uint32_t file_size = file.tellp();
-    // std::cout << "File size: " << file_size << std::endl;
-
-    // Ensure file size is large enough for the page
-    // uint32_t required_size = (page_num + 1) * Constants::PAGE_SIZE;
-    // if (file_size < required_size) {
-    //     // Extend the file if necessary
-    //     file.clear();
-    //     file.seekp(required_size - 1);
-    //     file.write("\0", 1);  // Write a single byte to extend the file
-    //     file.flush();
-    // }
-
-    // Now we can safely seek to the target page position
     file.clear();
     file.seekp(page_num * Constants::PAGE_SIZE);
     if (file.fail()) {
         throw std::runtime_error("Seek failed at page " + std::to_string(page_num));
     }
-
-    // std::cout << "File write pointer is at: " << file.tellp() << std::endl;
 
     // Write the page data
     if (file.write(static_cast<char*>(pages[page_num]), Constants::PAGE_SIZE)) {

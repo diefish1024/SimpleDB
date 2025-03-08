@@ -9,6 +9,8 @@
 #include <string>
 #include <sstream>
 
+bool isDebugMode = false;
+
 void printPrompt() {
     std::cout << "db > ";
 }
@@ -36,9 +38,14 @@ void printConfig() {
 }
 
 int main(int argc, char* argv[]) {
-    if (argc > 1 && std::string(argv[1]) == "--show-config") {
-        printConfig();
-        return 0;
+    for (int i = 1; i < argc; ++i) {
+        if (std::string(argv[i]) == "-debug") {
+            isDebugMode = true;
+            std::cout << "Debug mode is ON." << std::endl;
+        } else if (std::string(argv[i]) == "--show-config") {
+            printConfig();
+            return 0;
+        }
     }
 
     // freopen("test.in", "r", stdin);
@@ -51,7 +58,7 @@ int main(int argc, char* argv[]) {
 
     InputBuffer input_buffer;
 
-    std::string filename(argv[1]);
+    std::string filename(argv[argc - 1]);
     // std::string filename = "test.db";
     DB db(filename);
     VirtualMachine vm(&db);

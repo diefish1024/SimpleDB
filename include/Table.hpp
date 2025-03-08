@@ -8,6 +8,8 @@
 #include <vector>
 #include <cstdint>
 
+extern bool isDebugMode;
+
 class Cursor;
 
 class Table {
