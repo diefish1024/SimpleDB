@@ -180,6 +180,14 @@ void BPlusTree::splitRoot(BPlusNode* oldRoot, int promotedKey, BPlusNode* newNod
 }
 
 void BPlusTree::insertNonFull(BPlusNode* node, int key, uint32_t childPageNum) {
+    if (isDebugMode) {
+        std::cout << "[DEBUG] insertNonFull: node->page_num=" << node->page_num
+                  << ", node->is_leaf=" << (node->is_leaf ? "Yes" : "No")
+                  << ", key=" << key << ", childPageNum=" << childPageNum << std::endl;
+    }
+    if (isDebugMode) {
+        printTree();
+    }
     int i = node->num_keys - 1;
     if (node->is_leaf) {
         // Should not be called for leaf nodes after split. SplitNode handles leaf split and parent insertion.
@@ -202,9 +210,10 @@ void BPlusTree::insertNonFull(BPlusNode* node, int key, uint32_t childPageNum) {
                 i++; // go to the right child (index i+1 after insertion in splitNode)
             }
             // else go to the left child (index i) which is default.
+        } else {
+            // Recursively insert into the (possibly newly split) child
+            insertNonFull(getNode(node->children[i]), key, childPageNum); // Pass down original childPageNum
         }
-        // Recursively insert into the (possibly newly split) child
-        insertNonFull(getNode(node->children[i]), key, childPageNum); // Pass down original childPageNum
     }
 }
 

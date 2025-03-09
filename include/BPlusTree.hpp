@@ -4,6 +4,8 @@
 #include "BPlusNode.hpp"
 #include "Cursor.hpp"
 
+extern bool isDebugMode;
+
 class BPlusTree {
 public:
     BPlusTree(Pager* pager, uint32_t root_page_num);
