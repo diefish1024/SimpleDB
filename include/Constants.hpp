@@ -10,7 +10,7 @@ namespace Constants {
     constexpr uint32_t COLUMN_EMAIL_MAX_LENGTH = 255;
     
     // Table
-    constexpr uint32_t MAX_ROWS = 10;
+    constexpr uint32_t MAX_ROWS = 10000;
     constexpr uint32_t METADATA_PAGE_NUM = 0;
     constexpr uint32_t METADATA_OFFSET = 0;
     constexpr uint32_t MAX_META_PAGES = 1;
@@ -22,7 +22,7 @@ namespace Constants {
     extern const uint32_t MAX_PAGES;
 
     // BPlusTree
-    constexpr uint32_t ORDER = 4;
+    constexpr uint32_t ORDER = 255;
 }
 
 #endif // CONSTANTS_HPP
