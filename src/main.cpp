@@ -38,28 +38,35 @@ void printConfig() {
 }
 
 int main(int argc, char* argv[]) {
+    bool debugMode = false;
+
+    std::string filename;
+    
     for (int i = 1; i < argc; ++i) {
-        if (std::string(argv[i]) == "-debug") {
-            isDebugMode = true;
-            std::cout << "Debug mode is ON." << std::endl;
-        } else if (std::string(argv[i]) == "--show-config") {
+        std::string arg = argv[i];
+        if (arg == "-debug") {
+            debugMode = true;
+        } else if (arg == "--show-config") {
             printConfig();
             return 0;
+        } else if (filename.empty()) {
+            filename = arg;
+        } else {
+            std::cerr << "Too many arguments provided." << std::endl;
+            return 1;
         }
     }
-
-    // freopen("test.in", "r", stdin);
-    // freopen("test.out", "w", stdout);
-
-    if (argc < 2) {
+    if (filename.empty()) {
         std::cerr << "Must supply a database filename." << std::endl;
         return 1;
     }
+    if (debugMode) {
+        isDebugMode = true;
+        std::cout << "Debug mode is ON." << std::endl;
+    }
 
     InputBuffer input_buffer;
-
-    std::string filename(argv[argc - 1]);
-    // std::string filename = "test.db";
+    
     DB db(filename);
     VirtualMachine vm(&db);
 
